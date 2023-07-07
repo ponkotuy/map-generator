@@ -8,6 +8,10 @@
   position: relative;
 }
 
+.MapForm {
+  text-align: center;
+}
+
 #small-map {
   z-index: 50;
 }

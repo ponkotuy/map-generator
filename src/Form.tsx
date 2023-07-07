@@ -1,6 +1,7 @@
 import {useState} from "react";
-import {DomUtil, LatLng, latLng} from "leaflet";
+import {LatLng, latLng} from "leaflet";
 import {SimpleMarker} from "./types";
+import {Button, ButtonGroup, Grid, InputLabel, Stack, TextField, Typography} from "@mui/material";
 
 interface Props {
   setPosition: (position: LatLng) => void;
@@ -9,7 +10,7 @@ interface Props {
 }
 
 function Form({setPosition, setMarkers, getJson}: Props) {
-  const [jsonValue, setJsonValue] = useState('');
+  const [jsonValue, setJsonValue] = useState("");
 
   const loadJson = () => {
     const obj = JSON.parse(jsonValue)
@@ -27,11 +28,25 @@ function Form({setPosition, setMarkers, getJson}: Props) {
   }
 
   return (
-    <form>
-      <label htmlFor='json'>State JSON</label>
-      <textarea id='json' value={jsonValue} onChange={e => setJsonValue(e.target.value)} />
-      <button type='button' onClick={loadJson}>Load JSON</button>
-      <button type='button' onClick={updateJson}>Update Textarea JSON</button>
+    <form className="MapForm">
+      <Stack spacing={2} mt={2}>
+        <Typography variant="h5">JSON</Typography>
+        <div>
+          <TextField
+            id="json"
+            value={jsonValue}
+            multiline fullWidth
+            variant="standard"
+            onChange={e => setJsonValue(e.target.value)}
+          />
+        </div>
+        <div>
+          <ButtonGroup variant="contained" aria-label="JSON button">
+            <Button type="button" onClick={loadJson} variant="outlined">Load JSON</Button>
+            <Button type="button" onClick={updateJson} variant="outlined">Update Textarea JSON</Button>
+          </ButtonGroup>
+        </div>
+      </Stack>
     </form>
 
   )

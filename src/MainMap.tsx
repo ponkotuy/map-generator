@@ -15,7 +15,7 @@ function MainMap({center, markers, onChange}: Props) {
   // first onChange Event when set map
   useEffect(() => {
     if(map) onChange(map);
-  }, [map]);
+  }, [map, onChange]);
 
   return (
     <MapContainer

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import {latLng, LatLngBounds, Map} from "leaflet";
 import 'leaflet/dist/leaflet.css';
@@ -13,11 +13,10 @@ function App() {
   const [markers, setMarkers] = useState<SimpleMarker[]>([]);
 
   const getJson = () => {
-    const json = {
+    return {
       center: position,
       markers
     };
-    return json;
   }
 
   const changeMain = (map: Map) => {
