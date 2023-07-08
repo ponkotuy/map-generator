@@ -7,6 +7,7 @@ import {DeleteForeverRounded} from "@mui/icons-material";
 interface Props {
   setPosition: (position: LatLng) => void;
   setMarkers: (markers: SimpleMarker[]) => void;
+  setZooms: (main: number, sub: number) => void;
   getJson: () => any;
 }
 
@@ -18,7 +19,7 @@ interface TempSimpleMarker {
 
 type MarkerLabel = "lat" | "lng" | "context";
 
-function Form({setPosition, setMarkers, getJson}: Props) {
+function Form({setPosition, setMarkers, setZooms, getJson}: Props) {
   const [jsonValue, setJsonValue] = useState("");
   const [tempMarkers, setTempMarkers] = useState<TempSimpleMarker[]>([]);
 
@@ -33,6 +34,9 @@ function Form({setPosition, setMarkers, getJson}: Props) {
         {lat: marker.lat.toString(), lng: marker.lng.toString(), context: marker.context}
       ));
       setTempMarkers(temps);
+    }
+    if(obj?.mainZoom && obj?.subZoom) {
+      setZooms(obj.mainZoom, obj.subZoom);
     }
   }
 
@@ -54,7 +58,9 @@ function Form({setPosition, setMarkers, getJson}: Props) {
 
   const deleteMarker = (index: number) => {
     return () => {
-      setTempMarkers(tempMarkers.splice(index));
+      tempMarkers.splice(index, 1);
+      setTempMarkers(tempMarkers);
+      updateMarkers();
     }
   }
 
@@ -74,7 +80,7 @@ function Form({setPosition, setMarkers, getJson}: Props) {
           {tempMarkers.map((marker, index) => (
             <Stack direction="row" spacing={2} key={index}>
               <TextField
-                key={"lat" + index}
+                key={"lat" + marker?.context}
                 variant="standard"
                 label="latitude"
                 type="text"
@@ -82,7 +88,7 @@ function Form({setPosition, setMarkers, getJson}: Props) {
                 onChange={changeMarkerInput(index, "lat")}
               />
               <TextField
-                key={"lng" + index}
+                key={"lng" + marker?.context}
                 variant="standard"
                 label="longitude"
                 type="text"
@@ -90,7 +96,7 @@ function Form({setPosition, setMarkers, getJson}: Props) {
                 onChange={changeMarkerInput(index, "lng")}
               />
               <TextField
-                key={"context" + index}
+                key={"context" + marker?.context}
                 variant="standard"
                 label="context"
                 type="text"

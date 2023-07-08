@@ -1,15 +1,17 @@
-import {MapContainer, Marker, TileLayer, Tooltip, useMapEvents} from "react-leaflet";
+import {MapContainer, Marker, TileLayer, Tooltip} from "react-leaflet";
 import {LatLng, latLng, Map} from "leaflet";
 import {useEffect, useState} from "react";
 import {DefaultIcon} from "./variables";
 import {SimpleMarker} from "./types";
+import {LocationHandler, LocationHandlerProps} from "./LocationHandler";
 
 interface Props extends LocationHandlerProps {
   center: LatLng;
+  zoom: number;
   markers: SimpleMarker[];
 }
 
-function MainMap({center, markers, onChange}: Props) {
+function MainMap({center, zoom, markers, onChange}: Props) {
   const [map, setMap] = useState<Map | null>(null);
 
   // first onChange Event when set map
@@ -17,11 +19,16 @@ function MainMap({center, markers, onChange}: Props) {
     if(map) onChange(map);
   }, [map, onChange]);
 
+  // change zoom
+  useEffect(() => {
+    if(map) map.setZoom(zoom);
+  }, [map, zoom])
+
   return (
     <MapContainer
       id='small-map'
       center={center}
-      zoom={12}
+      zoom={zoom}
       scrollWheelZoom={true}
       zoomControl={false}
       style={{width: "1280px", height: "960px"}}
@@ -39,19 +46,6 @@ function MainMap({center, markers, onChange}: Props) {
       ))}
     </MapContainer>
   );
-}
-
-interface LocationHandlerProps {
-  onChange: (map: Map) => void;
-}
-
-function LocationHandler({onChange}: LocationHandlerProps) {
-  useMapEvents({
-    moveend: (e) => {
-      onChange(e.target);
-    }
-  });
-  return <></>;
 }
 
 export default MainMap;
