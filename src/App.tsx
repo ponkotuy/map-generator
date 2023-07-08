@@ -6,6 +6,7 @@ import MainMap from "./MainMap";
 import {SimpleMarker} from "./types";
 import SubMap from "./SubMap";
 import Form from "./Form";
+import {Typography} from "@mui/material";
 
 function App() {
   const [position, setPosition] = useState(latLng(35.6809591, 139.7673068));
@@ -26,6 +27,8 @@ function App() {
 
   return (
     <div className="App">
+      <Typography variant="h2" align="center" mt={4}>Map Generator</Typography>
+      <Typography variant="h6" align="right" mr={8}>by @ponkotuy@social.mikutter.hachune.net</Typography>
       <div className="Maps">
         <MainMap center={position} markers={markers} onChange={changeMain} />
         <SubMap center={position} bounds={bounds} />
