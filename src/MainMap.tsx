@@ -34,7 +34,7 @@ function MainMap({center, markers, onChange}: Props) {
       <LocationHandler onChange={onChange} />
       {markers.map(marker => (
         <Marker position={latLng(marker.lat, marker.lng)} icon={DefaultIcon}>
-          <Tooltip permanent>{marker.context}</Tooltip>
+          <Tooltip permanent direction='bottom'>{marker.context}</Tooltip>
         </Marker>
       ))}
     </MapContainer>

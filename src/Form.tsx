@@ -1,7 +1,8 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {LatLng, latLng} from "leaflet";
 import {SimpleMarker} from "./types";
-import {Button, ButtonGroup, Grid, InputLabel, Stack, TextField, Typography} from "@mui/material";
+import {Button, ButtonGroup, Stack, TextField, Typography} from "@mui/material";
+import {DeleteForeverRounded} from "@mui/icons-material";
 
 interface Props {
   setPosition: (position: LatLng) => void;
@@ -9,8 +10,17 @@ interface Props {
   getJson: () => any;
 }
 
+interface TempSimpleMarker {
+  lat?: string;
+  lng?: string;
+  context?: string;
+}
+
+type MarkerLabel = "lat" | "lng" | "context";
+
 function Form({setPosition, setMarkers, getJson}: Props) {
   const [jsonValue, setJsonValue] = useState("");
+  const [tempMarkers, setTempMarkers] = useState<TempSimpleMarker[]>([]);
 
   const loadJson = () => {
     const obj = JSON.parse(jsonValue)
@@ -19,6 +29,10 @@ function Form({setPosition, setMarkers, getJson}: Props) {
     }
     if(obj?.markers) {
       setMarkers(obj.markers);
+      const temps = obj.markers.map((marker: SimpleMarker) => (
+        {lat: marker.lat.toString(), lng: marker.lng.toString(), context: marker.context}
+      ));
+      setTempMarkers(temps);
     }
   }
 
@@ -27,25 +41,92 @@ function Form({setPosition, setMarkers, getJson}: Props) {
     setJsonValue(json);
   }
 
+  const addMarker = () => {
+    setTempMarkers(tempMarkers.concat({}));
+  }
+
+  const changeMarkerInput = (index: number, label: MarkerLabel) => {
+    return ((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      tempMarkers[index][label] = e.target.value;
+      setTempMarkers(tempMarkers);
+    })
+  }
+
+  const deleteMarker = (index: number) => {
+    return () => {
+      setTempMarkers(tempMarkers.splice(index));
+    }
+  }
+
+  const updateMarkers = () => {
+    const markers =
+      tempMarkers.map(marker =>
+        (marker.lat && marker.lng && marker.context) ? {lat: parseFloat(marker.lat), lng: parseFloat(marker.lng), context: marker.context} : null
+      ).filter((item): item is NonNullable<typeof item> => item != null)
+    setMarkers(markers)
+  }
+
   return (
     <form className="MapForm">
-      <Stack spacing={2} mt={2}>
-        <Typography variant="h5">JSON</Typography>
-        <div>
-          <TextField
-            id="json"
-            value={jsonValue}
-            multiline fullWidth
-            variant="standard"
-            onChange={e => setJsonValue(e.target.value)}
-          />
-        </div>
-        <div>
-          <ButtonGroup variant="contained" aria-label="JSON button">
-            <Button type="button" onClick={loadJson} variant="outlined">Load JSON</Button>
-            <Button type="button" onClick={updateJson} variant="outlined">Update Textarea JSON</Button>
-          </ButtonGroup>
-        </div>
+      <Stack spacing={4} mt={2}>
+        <Stack spacing={2}>
+          <Typography variant="h5">Markers</Typography>
+          {tempMarkers.map((marker, index) => (
+            <Stack direction="row" spacing={2} key={index}>
+              <TextField
+                key={"lat" + index}
+                variant="standard"
+                label="latitude"
+                type="text"
+                defaultValue={marker?.lat}
+                onChange={changeMarkerInput(index, "lat")}
+              />
+              <TextField
+                key={"lng" + index}
+                variant="standard"
+                label="longitude"
+                type="text"
+                defaultValue={marker?.lng}
+                onChange={changeMarkerInput(index, "lng")}
+              />
+              <TextField
+                key={"context" + index}
+                variant="standard"
+                label="context"
+                type="text"
+                fullWidth
+                defaultValue={marker?.context}
+                onBlur={changeMarkerInput(index, "context")}
+              />
+              <Button type="button" variant="outlined" color="error" onClick={deleteMarker(index)}>
+                <DeleteForeverRounded />
+              </Button>
+            </Stack>
+          ))}
+          <Stack direction="row" spacing={1} justifyContent="center">
+            <Button type="button" onClick={addMarker} variant="outlined" color="secondary">Add Marker</Button>
+            <Button type="button" onClick={updateMarkers} variant="contained">Set</Button>
+          </Stack>
+        </Stack>
+        <Stack spacing={2}>
+          <Typography variant="h5">JSON</Typography>
+          <div>
+            <TextField
+              id="json"
+              label="json value"
+              value={jsonValue}
+              multiline fullWidth
+              variant="standard"
+              onChange={e => setJsonValue(e.target.value)}
+            />
+          </div>
+          <div>
+            <ButtonGroup variant="outlined" aria-label="JSON button">
+              <Button type="button" onClick={loadJson} variant="outlined">Load JSON</Button>
+              <Button type="button" onClick={updateJson} variant="outlined">Update Textarea JSON</Button>
+            </ButtonGroup>
+          </div>
+        </Stack>
       </Stack>
     </form>
 
